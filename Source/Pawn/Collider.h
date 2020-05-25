@@ -26,4 +26,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	class UStaticMeshComponent* MeshComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	class USphereComponent* SphereComponent;
+
+	//Anywhere in your code you have meshcomponent, it will treat it like a macro - it will take the return value
+	//of GetMeshcomponent and paste it wherever GetMeshCompnent() is called - it happens at compile time.(faster)
+	FORCEINLINE UStaticMeshComponent* GetMeshComponent() { return MeshComponent; }
+	FORCEINLINE void SetMeshComponent(UStaticMeshComponent* Mesh) { MeshComponent = Mesh; }
+
+	FORCEINLINE USphereComponent* GetSphereComponent() { return SphereComponent; }
+	FORCEINLINE void SetMeshComponent(USphereComponent* Sphere) { SphereComponent = Sphere; }
+
+	
+
+
 };
