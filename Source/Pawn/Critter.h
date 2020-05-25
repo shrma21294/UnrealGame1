@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Critter.generated.h"
+#include "Critter.generated.h" //never include anything after this !!!
 
 UCLASS()
 class PAWN_API ACritter : public APawn
@@ -26,8 +26,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* MeshComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+	class USkeletalMeshComponent* MeshComponent; //has a skeleton, it moves, crawls - like  spider
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
