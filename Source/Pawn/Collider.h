@@ -32,6 +32,13 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	class USphereComponent* SphereComponent;
 
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	class UCameraComponent* Camera;
+
+	//help to control camera motion
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	class USpringArmComponent* SpringArm;
+
 	//Anywhere in your code you have meshcomponent, it will treat it like a macro - it will take the return value
 	//of GetMeshcomponent and paste it wherever GetMeshCompnent() is called - it happens at compile time.(faster)
 	FORCEINLINE UStaticMeshComponent* GetMeshComponent() { return MeshComponent; }
@@ -40,7 +47,15 @@ public:
 	FORCEINLINE USphereComponent* GetSphereComponent() { return SphereComponent; }
 	FORCEINLINE void SetMeshComponent(USphereComponent* Sphere) { SphereComponent = Sphere; }
 
-	
+	FORCEINLINE UCameraComponent* GetCameraComponent() { return Camera; }
+	FORCEINLINE void SetMeshComponent(UCameraComponent* InCamera) { Camera = InCamera; }
+
+	FORCEINLINE USpringArmComponent* GetSpringArmComponent() { return SpringArm; }
+	FORCEINLINE void SetSpringArmComponent(USpringArmComponent* InSpringArm) { SpringArm = InSpringArm; }
+
+private:
+	void MoveForward(float input);
+	void MoveRight(float input);
 
 
 };
