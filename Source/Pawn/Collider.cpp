@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "ColliderMovementComponent.h"
 
 // Sets default values
 ACollider::ACollider()
@@ -40,7 +41,10 @@ ACollider::ACollider()
 	SpringArm->CameraLagSpeed = 3.f;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(GetRootComponent());
+	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
+	OurMovementComponent = CreateDefaultSubobject<UColliderMovementComponent>(TEXT("MovementComponent"));
+	OurMovementComponent->UpdatedComponent = RootComponent;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
@@ -73,11 +77,28 @@ void ACollider::MoveForward(float input)
 {
 
 	FVector Forward = GetActorForwardVector();
+
 	AddMovementInput(input * Forward);
+
+	if (OurMovementComponent)
+	{
+		OurMovementComponent->AddInputVector(input * Forward);
+	}
+
 }
 
 void ACollider::MoveRight(float input)
 {
 	FVector Right = GetActorRightVector();
 	AddMovementInput(input * Right);
+
+	if (OurMovementComponent)
+	{
+		OurMovementComponent->AddInputVector(input * Right);
+	}
+}
+
+UPawnMovementComponent* ACollider::GetMovementComponent() const 
+{
+	return OurMovementComponent;
 }

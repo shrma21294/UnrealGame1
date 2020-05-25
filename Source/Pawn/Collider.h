@@ -39,6 +39,11 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	class USpringArmComponent* SpringArm;
 
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	class UColliderMovementComponent* OurMovementComponent;
+
+	virtual UPawnMovementComponent* GetMovementComponent() const override;
+
 	//Anywhere in your code you have meshcomponent, it will treat it like a macro - it will take the return value
 	//of GetMeshcomponent and paste it wherever GetMeshCompnent() is called - it happens at compile time.(faster)
 	FORCEINLINE UStaticMeshComponent* GetMeshComponent() { return MeshComponent; }
