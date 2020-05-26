@@ -13,6 +13,10 @@ AFloatingPlatform::AFloatingPlatform()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 
+	StartPoint = FVector(0.f);
+	EndPoint = FVector(0.f);
+
+	InterpSpeed =  4.f;
 }
 
 // Called when the game starts or when spawned
@@ -20,12 +24,21 @@ void AFloatingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	StartPoint = GetActorLocation();
+	EndPoint += StartPoint;
 }
 
 // Called every frame
 void AFloatingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//Doing interpolation between current location and the end point
+	FVector CurrentLocation = GetActorLocation();
+
+	FVector Interp = FMath::VInterpTo(CurrentLocation, EndPoint, DeltaTime, InterpSpeed);
+
+	SetActorLocation(Interp);
 
 }
 

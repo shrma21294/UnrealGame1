@@ -16,8 +16,18 @@ public:
 	AFloatingPlatform();
 
 	//Mesh for the platform
-	UPROPERTY(VisibleAnywhere, BlueprintReadyOnly, Category = "Platform")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Platform")
 	class UStaticMeshComponent* Mesh;
+
+	UPROPERTY(EditAnywhere)
+	FVector StartPoint;
+
+	//meta is a specifier - 
+	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = "true"))
+	FVector EndPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Platform")
+	float InterpSpeed;
 
 protected:
 	// Called when the game starts or when spawned
