@@ -16,13 +16,13 @@ public:
 	ASpawnVolume();
 
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawing")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	class UBoxComponent* SpawingBox;
 
 	//TSubclassOf create this variable PawnToSpawn variable and we can this from a dropdwon in the bluprint
 	//TSubclassOf allow us to have nice drowpdown in the bluerint
 	//This is how you get BP variable in your code - set from BP and use here in cpp code
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawing")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning")
 	TSubclassOf<class ACritter> PawnToSpawn;
 
 protected:
@@ -35,5 +35,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Spawning")
 	FVector GetSpawnPoint();
+
+	//Actor, Pawn they all derive from UClass
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Spawning")
+	void SpawnOurPawn(UClass* ToSpawn, const FVector& Location);
 
 };

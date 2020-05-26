@@ -4,6 +4,8 @@
 #include "SpawnVolume.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Engine/World.h"
+#include "Critter.h"
 
 // Sets default values
 ASpawnVolume::ASpawnVolume()
@@ -38,5 +40,22 @@ FVector ASpawnVolume::GetSpawnPoint()
 	//finds a random point btw origin and extent
 	FVector Point = UKismetMathLibrary::RandomPointInBoundingBox(Origin, Extent);
 	return Point;
+}
+
+//when we make a Blueprint native event, our function should be named with _Imp0lementation
+//in theat way unreal engine will now this the implementation that we scripted in cpp
+//and then part of it will also be carried out in Blueprints
+void ASpawnVolume::SpawnOurPawn_Implementation(UClass* ToSpawn, const FVector& Location)
+{
+	if (ToSpawn)
+	{
+		UWorld* World = GetWorld();
+		FActorSpawnParameters SpawnParams;
+
+		if (World)
+		{
+			ACritter* CritterSpawned = World->SpawnActor<ACritter>(ToSpawn, Location, FRotator(0.f), SpawnParams);
+		}
+	}
 }
 
