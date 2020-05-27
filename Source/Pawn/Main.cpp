@@ -8,6 +8,7 @@
 #include "Engine/World.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AMain::AMain()
@@ -50,7 +51,7 @@ AMain::AMain()
 
 	MaxHealth = 100.f;
 	Health = 65.f;
-	MaxStamina = 350.f;
+	MaxStamina = 150.f;
 	Stamina = 120.f;
 	Coins = 0;
 
@@ -62,12 +63,17 @@ AMain::AMain()
 	//Initialize enums
 	MovementStatus = EMovementStatus::EMS_Normal;
 	StaminaStatus = EStaminaStatus::ESS_Normal;
+
+	StaminaDrainRate = 25.f;
+	MinSprintStamina = 50.f;
 }
 
 // Called when the game starts or when spawned
 void AMain::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 	
 }
 
@@ -75,6 +81,102 @@ void AMain::BeginPlay()
 void AMain::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	float DeltaStamina = StaminaDrainRate * DeltaTime;
+	
+	switch (StaminaStatus)
+	{
+	case EStaminaStatus::ESS_Normal:
+		if (bShiftKeyDown) //shift key down - shifty for sprinting state
+		{
+			if (Stamina - DeltaStamina <= MinSprintStamina)
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_BelowNormal);
+				Stamina -= DeltaStamina;
+			}
+			else
+			{
+				Stamina -= DeltaStamina;
+			}
+			SetMovementStatus(EMovementStatus::EMS_Sprinting);
+		}
+		else //shift key is up
+		{
+			if (Stamina + DeltaStamina >= MaxStamina)
+			{
+				Stamina = MaxStamina;
+			}
+			else
+			{
+				Stamina += DeltaStamina;
+			}
+			SetMovementStatus(EMovementStatus::EMS_Normal);
+		}
+
+		break;
+
+	case EStaminaStatus::ESS_BelowNormal:
+		if (bShiftKeyDown)
+		{
+			if (Stamina - DeltaStamina <= 0.f)
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_EXhausted);
+				Stamina = 0.f;
+
+				SetMovementStatus(EMovementStatus::EMS_Normal);
+			}
+			else
+			{
+				Stamina -= DeltaStamina;
+				SetMovementStatus(EMovementStatus::EMS_Sprinting);
+			}
+		}
+		else //shift key up
+		{
+			if (Stamina + DeltaStamina >= MinSprintStamina)
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_Normal);
+				Stamina += DeltaStamina;
+			}
+			else
+			{
+				Stamina += DeltaStamina;
+			}
+			SetMovementStatus(EMovementStatus::EMS_Normal);
+		}
+		break;
+
+	case EStaminaStatus::ESS_EXhausted:
+		if (bShiftKeyDown)
+		{
+			Stamina = 0.f; //character havbe to left shift key
+		}
+		else //shift key up
+		{
+			SetStaminaStatus(EStaminaStatus::ESS_ExhaustedRecovering);
+			Stamina += DeltaStamina;
+		}
+
+		SetMovementStatus(EMovementStatus::EMS_Normal);
+		break;
+
+	case EStaminaStatus::ESS_ExhaustedRecovering:
+		if (Stamina + DeltaStamina >= MinSprintStamina)
+		{
+			SetStaminaStatus(EStaminaStatus::ESS_Normal);
+			Stamina += DeltaStamina;
+		}
+		else //shift key up
+		{
+			Stamina += DeltaStamina;
+		}
+
+		SetMovementStatus(EMovementStatus::EMS_Normal);
+		break;
+
+	default:
+		;
+	}
 
 }
 
@@ -185,4 +287,21 @@ void AMain::ShiftKeyDown()
 void AMain::ShiftKeyUp()
 {
 	bShiftKeyDown = false;
+}
+
+void  AMain::ShowPickupLocations()
+{
+	//for (int32 i = 0; i < PickupLocations.Num(); i++)
+	//{
+	//	//Debug sphere - tool 
+	//	UKismetSystemLibrary::DrawDebugSphere(this,PickupLocations[i], 25.f, 8, FLinearColor::Green, 10.f, 0.5f);
+	//}
+
+	//second : Range based for loop
+	//can use - auto Location - auto will let the compiler deduce this for you - no need specify the type
+	for (FVector Location : PickupLocations)
+	{
+		//Debug sphere - For testing the logic in the scene - Here testing the location of PickupLocationsof the coins
+		UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Green, 10.f, 0.5f);
+	}
 }
