@@ -33,6 +33,7 @@ void AWeapon::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
  }
 
+//check the character is valid and attaching the weapon to the socket. Stop the rotation of the socket once equipped by the character.
 void  AWeapon::Equip(AMain* Char)
 {
 	if (Char)
@@ -49,6 +50,8 @@ void  AWeapon::Equip(AMain* Char)
 		{
 			RightHandSocket->AttachActor(this, Char->GetMesh());
 			bRotate = false;
+
+			Char->SetEquippedWeapon(this);
 		}
 	}
 }
