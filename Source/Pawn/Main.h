@@ -138,11 +138,23 @@ public:
 	//@param Rate This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	void LookUpAtRate(float Rate);
 
+	bool bLMBDown;
+
+	void LMBDown();
+
+	void LMBUp();
+
+
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Items)
 	class AWeapon* EquippedWeapon;
 
-	FORCEINLINE void SetEquippedWeapon(AWeapon* WeaponToSet) { EquippedWeapon = WeaponToSet; }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Items)
+		class AItem* ActiveOverlappingItem;
+
+	FORCEINLINE AWeapon* GetEquippedWeapon() { return EquippedWeapon; }
+	void SetEquippedWeapon(AWeapon* WeaponToSet);
+	FORCEINLINE void SetActiveOverlappingItem(AItem* Item) { ActiveOverlappingItem = Item; }
 };
