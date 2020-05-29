@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "AIController.h"
 #include "Main.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -20,7 +21,7 @@ AEnemy::AEnemy()
 	CombatSphere->SetupAttachment(GetRootComponent());
 	CombatSphere->InitSphereRadius(75.f);
 
-
+	bOverlappingCombatSphere = false;
 }
 
 // Called when the game starts or when spawned
@@ -70,19 +71,51 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
  void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
  {
-
+	 if (OtherActor)
+	 {
+		 AMain* Main = Cast<AMain>(OtherActor);
+		 if (Main)
+		 {
+			 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Idle);
+			 if (AIController)
+			 {
+				 AIController->StopMovement();
+			 }
+		 }
+	 }
  }
 
 
  void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
  {
-
+	 if (OtherActor)
+	 {
+		 AMain* Main = Cast<AMain>(OtherActor);
+		 if (Main)
+		 {
+			 CombatTarget = Main;
+			 bOverlappingCombatSphere = true;
+			 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+		 }
+	 }
  }
 
 
  void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
  {
-
+	 if (OtherActor)
+	 {
+		 AMain* Main = Cast<AMain>(OtherActor);
+		 if (Main)
+		 {
+			 bOverlappingCombatSphere = false;
+			 if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
+			 {
+				 MoveToTarget(Main);
+				 CombatTarget = nullptr;
+			 }
+		 }
+	 }
  }
 
  //Move the enemy towards the character when come under the colliding sphere
@@ -90,6 +123,13 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
  //then move toward the target
 
 //If not able to recognise AIController - add AIMOdule under Pawn.Build.cs file
+ //Implementing enemy move to character using this function
+// virtual FPathFollowingRequestResult MoveTo
+// (
+//	 const FAIMoveRequest& MoveRequest,
+//	 FNavPathSharedPtr* OutPath
+// )
+// 
  void AEnemy::MoveToTarget(class AMain* Target)
  {
 	 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_MoveToTarget);
@@ -99,12 +139,31 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		// UE_LOG(LogTemp, Warning, TEXT("MoveToTarget"));
 		 FAIMoveRequest MoveRequest;
 		 MoveRequest.SetGoalActor(Target);
-		 MoveRequest.SetAcceptanceRadius(5.f);
+
+		 //distance btw the capsules collider of the enemy and the player
+		 MoveRequest.SetAcceptanceRadius(10.f);
 
 		 FNavPathSharedPtr NavPath;
 
 		 AIController->MoveTo(MoveRequest, &NavPath);
 
+		 //FNavPAth is a pointer here
+
+		 //Two way to implement the following - it's an array
+		// TArray<FNavPathPoint> PathPoints =  NavPath->GetPathPoints();
+
+		//-------- Uncomment this function to see the path between enemy and the character
+		 /**
+		 auto PathPoints = NavPath->GetPathPoints();
+
+		 for (auto Point : PathPoints)
+		 {
+			 FVector Location = Point.Location;
+
+			 //Drawing debug spheres to see the path btw enemy and the character
+			 UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 8, FLinearColor::Red, 10.f, 1.5f);
+		 }
+		 */
 	 }
 
  }
