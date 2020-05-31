@@ -8,11 +8,15 @@
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Components/BoxComponent.h"
 
 AWeapon::AWeapon()
 {
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMesh->SetupAttachment(GetRootComponent());
+
+	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollsion"));
+	CombatCollision->SetupAttachment(GetRootComponent());
 
 	bWeaponParticles = false;
 
