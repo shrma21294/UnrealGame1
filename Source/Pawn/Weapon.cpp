@@ -10,6 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/BoxComponent.h"
 #include "Enemy.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 AWeapon::AWeapon()
 {
@@ -109,7 +110,14 @@ void AWeapon::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
 		{
 			if (Enemy->HitParticles)
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Enemy->HitParticles, GetActorLocation(), FRotator(0.f), false);
+				const USkeletalMeshSocket* WeaponSocket = SkeletalMesh->GetSocketByName("WeaponSocket");
+				if (WeaponSocket)
+				{
+					//positon/location where the blood spurt spawing on the sword - setting the socket here
+					FVector SocketLocation = WeaponSocket->GetSocketLocation(SkeletalMesh);
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Enemy->HitParticles, SocketLocation, FRotator(0.f), false);
+				}
+				
 			}
 		}
 	}
