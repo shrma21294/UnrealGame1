@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Sound/SoundCue.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -27,8 +28,9 @@ AEnemy::AEnemy()
 	CombatSphere->SetupAttachment(GetRootComponent());
 	CombatSphere->InitSphereRadius(75.f);
 
-	//added socket to the enemy onthe left arm knee names - enemy socket - this is for enemy combat
-	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollsion"));
+	//added socket to the enemy on the left arm knee named - enemy socket - this is for enemy combat
+	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
+	CombatCollision->RegisterComponent();
 	CombatCollision->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
 
 	bOverlappingCombatSphere = false;
@@ -52,6 +54,9 @@ void AEnemy::BeginPlay()
 
 	CombatSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapBegin);
 	CombatSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapEnd);
+
+	CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
+	CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
 
 	//setting the collsion parameters
 	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -111,12 +116,15 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	 if (OtherActor)
 	 {
 		 AMain* Main = Cast<AMain>(OtherActor);
-		 if (Main)
 		 {
-			 CombatTarget = Main;
-			 bOverlappingCombatSphere = true;
-			 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+			 if (Main)
+			 {
+				 CombatTarget = Main;
+				 bOverlappingCombatSphere = true;
+				 Attack();
+			 }
 		 }
+		 
 	 }
  }
 
@@ -218,6 +226,54 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
  void AEnemy::CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
  {
 
+ }
+
+ void AEnemy::ActivateCollsion()
+ {
+	 CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+ }
+
+
+ void AEnemy::DeactivateCollsion()
+ {
+	 CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+ }
+
+ //Play the attack function - which plays the enemy monatge where you have the attack animations setup
+ //play swing sound when enemey claw is swinged
+ void AEnemy::Attack()
+ {
+	 if (AIController)
+	 {
+		 AIController->StopMovement();
+		 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+	 }
+
+	 if (!bAttacking)
+	 {
+		 //play attacking animatioon
+		 bAttacking = true;
+		 UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		 if (AnimInstance)
+		 {
+			 AnimInstance->Montage_Play(CombatMontage, 1.35f);
+			 AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage); 
+
+			 if (SwingSound)
+			 {
+				 UGameplayStatics::PlaySound2D(this, SwingSound);
+			 }
+		 }
+	 }
+ }
+
+ void AEnemy::AttackEnd()
+ {
+	 bAttacking = false;
+	 if (bOverlappingCombatSphere)
+	 {
+		 Attack();
+	 }
  }
 
 

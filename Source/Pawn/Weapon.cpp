@@ -17,7 +17,7 @@ AWeapon::AWeapon()
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMesh->SetupAttachment(GetRootComponent());
 
-	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollsion"));
+	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
 	CombatCollision->SetupAttachment(GetRootComponent());
 
 	bWeaponParticles = false;

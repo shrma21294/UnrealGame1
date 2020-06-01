@@ -58,8 +58,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	USoundCue* SwingSound;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	class UBoxComponent* CombatCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	class UAnimMontage* CombatMontage;
 
 protected:
 	// Called when the game starts or when spawned
@@ -99,4 +102,17 @@ public:
 	UFUNCTION()
 	void CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(BlueprintCallable)
+	void ActivateCollsion();
+
+	UFUNCTION(BlueprintCallable)
+	void DeactivateCollsion();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bAttacking;
+
+	void Attack();
+
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
 };
