@@ -6,6 +6,12 @@
 #include "AIController.h"
 #include "Main.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/BoxComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Main.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -20,6 +26,10 @@ AEnemy::AEnemy()
 	CombatSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CombatSphere"));
 	CombatSphere->SetupAttachment(GetRootComponent());
 	CombatSphere->InitSphereRadius(75.f);
+
+	//added socket to the enemy onthe left arm knee names - enemy socket - this is for enemy combat
+	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollsion"));
+	CombatCollision->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
 
 	bOverlappingCombatSphere = false;
 
@@ -42,6 +52,12 @@ void AEnemy::BeginPlay()
 
 	CombatSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapBegin);
 	CombatSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapEnd);
+
+	//setting the collsion parameters
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	
 }
 
@@ -169,6 +185,38 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 }
 		 */
 	 }
+
+ }
+
+ void AEnemy::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+ {
+	 if (OtherActor)
+	 {
+		 AMain* Main = Cast<AMain>(OtherActor);
+		 if (Main)
+		 {
+			 if (Main->HitParticles)
+			 {
+				 const USkeletalMeshSocket* TipSocket = GetMesh()->GetSocketByName("TipSocket");
+				 if (TipSocket)
+				 {
+					 //positon/location where the blood spurt spawing on the sword - setting the socket here
+					 FVector SocketLocation = TipSocket->GetSocketLocation(GetMesh());
+					 UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Main->HitParticles, SocketLocation, FRotator(0.f), false);
+				 }
+
+			 }
+			 if (Main->HitSound)
+			 {
+				 UGameplayStatics::PlaySound2D(this, Main->HitSound);
+			 }
+		 }
+	 }
+ }
+
+
+ void AEnemy::CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+ {
 
  }
 
