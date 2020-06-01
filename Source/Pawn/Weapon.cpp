@@ -107,6 +107,9 @@ void  AWeapon::Equip(AMain* Char)
 	}
 }
 
+//connecting a socket to the sword with particle system - blood spurt.
+//When palyer hits the enemy, particle system gets activated
+//When player hits the enemy, enable the hit sound
 void AWeapon::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor)
@@ -124,6 +127,10 @@ void AWeapon::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
 					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Enemy->HitParticles, SocketLocation, FRotator(0.f), false);
 				}
 				
+			}
+			if (Enemy->HitSound)
+			{
+				UGameplayStatics::PlaySound2D(this, Enemy->HitSound);
 			}
 		}
 	}
