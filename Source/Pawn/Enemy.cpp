@@ -232,6 +232,10 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
  void AEnemy::ActivateCollsion()
  {
 	 CombatCollisionEnemy->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	 if (SwingSound)
+	 {
+		 UGameplayStatics::PlaySound2D(this, SwingSound);
+	 }
  }
 
 
@@ -259,11 +263,6 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 {
 			 AnimInstance->Montage_Play(CombatMontage, 1.35f);
 			 AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage); 
-
-			 if (SwingSound)
-			 {
-				 UGameplayStatics::PlaySound2D(this, SwingSound);
-			 }
 		 }
 	 }
  }
