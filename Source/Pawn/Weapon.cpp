@@ -17,8 +17,8 @@ AWeapon::AWeapon()
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMesh->SetupAttachment(GetRootComponent());
 
-	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
-	CombatCollision->SetupAttachment(GetRootComponent());
+	CombatCollisionWeapon = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
+	CombatCollisionWeapon->SetupAttachment(GetRootComponent());
 
 	bWeaponParticles = false;
 
@@ -31,14 +31,14 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::CombatOnOverlapBegin);
-	CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AWeapon::CombatOnOverlapEnd);
+	CombatCollisionWeapon->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::CombatOnOverlapBegin);
+	CombatCollisionWeapon->OnComponentEndOverlap.AddDynamic(this, &AWeapon::CombatOnOverlapEnd);
 
 	//setting the parameter for collsion with the enemy here
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	CombatCollisionWeapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollisionWeapon->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	CombatCollisionWeapon->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CombatCollisionWeapon->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
 }
 
@@ -144,11 +144,11 @@ void AWeapon::CombatOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AWeapon::ActivateCollsion()
 {
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CombatCollisionWeapon->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 
 void AWeapon::DeactivateCollsion()
 {
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollisionWeapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

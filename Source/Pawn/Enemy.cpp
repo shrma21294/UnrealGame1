@@ -29,9 +29,10 @@ AEnemy::AEnemy()
 	CombatSphere->InitSphereRadius(75.f);
 
 	//added socket to the enemy on the left arm knee named - enemy socket - this is for enemy combat
-	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
-	CombatCollision->RegisterComponent();
-	CombatCollision->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
+	CombatCollisionEnemy = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollisionEnemy"));
+	//CombatCollisionEnemy->RegisterComponent();
+	//CombatCollisionEnemy->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
+	CombatCollisionEnemy->SetupAttachment(GetMesh(), FName("EnemySocket"));
 
 	bOverlappingCombatSphere = false;
 
@@ -55,14 +56,14 @@ void AEnemy::BeginPlay()
 	CombatSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapBegin);
 	CombatSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatSphereOnOverlapEnd);
 
-	CombatCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
-	CombatCollision->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
+	CombatCollisionEnemy->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapBegin);
+	CombatCollisionEnemy->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatOnOverlapEnd);
 
 	//setting the collsion parameters
-	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	CombatCollisionEnemy->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatCollisionEnemy->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	CombatCollisionEnemy->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	CombatCollisionEnemy->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	
 }
 
@@ -230,13 +231,13 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
  void AEnemy::ActivateCollsion()
  {
-	 CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	 CombatCollisionEnemy->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
  }
 
 
  void AEnemy::DeactivateCollsion()
  {
-	 CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	 CombatCollisionEnemy->SetCollisionEnabled(ECollisionEnabled::NoCollision);
  }
 
  //Play the attack function - which plays the enemy monatge where you have the attack animations setup

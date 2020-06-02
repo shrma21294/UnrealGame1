@@ -45,7 +45,7 @@ public:
 	class USkeletalMeshComponent* SkeletalMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item | Combat")
-	class UBoxComponent* CombatCollision;
+	class UBoxComponent* CombatCollisionWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Combat")
 	float Damage;

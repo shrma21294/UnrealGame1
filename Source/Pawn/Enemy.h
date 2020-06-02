@@ -58,8 +58,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	USoundCue* SwingSound;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
-	class UBoxComponent* CombatCollision;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	class UBoxComponent* CombatCollisionEnemy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	class UAnimMontage* CombatMontage;
