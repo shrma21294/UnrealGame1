@@ -120,6 +120,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 {
 			 if (Main)
 			 {
+				 Main->SetCombatTarget(this);
 				 CombatTarget = Main;
 				 bOverlappingCombatSphere = true;
 				 Attack();
@@ -137,6 +138,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
+			 Main->SetCombatTarget(nullptr);
 			 bOverlappingCombatSphere = false;
 			 if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
 			 {

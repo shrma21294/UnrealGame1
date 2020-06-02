@@ -61,6 +61,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MinSprintStamina;
 
+	float InterpSpeed;
+
+	bool bInterpToEnemy;
+
+	void SetInterpToEnemy(bool Interp);
+
+	//Combat target is used for interpolation - Basically face the player to the enemy to make it easy to attack
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly , Category = "Combat")
+	class AEnemy* CombatTarget;
+
+	FORCEINLINE void SetCombatTarget(AEnemy* Target) {CombatTarget = Target;}
+
+	//rotate the player to look at the enemy
+	FRotator GetLookAtRotationYaw(FVector Target);
+
 	//Set movement statusc and running speed
 	void SetMovementStatus(EMovementStatus Status);
 
