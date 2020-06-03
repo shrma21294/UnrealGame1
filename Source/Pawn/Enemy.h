@@ -12,6 +12,7 @@ enum class EEnemyMovementStatus : uint8
 	EMS_Idle			UMETA(DisplayName = "Idle"),
 	EMS_MoveToTarget	UMETA(DisplayName = "MoveToTarget"),
 	EMS_Attacking		UMETA(DisplayName = "Attacking"), 
+	EMS_Dead			UMETA(DisplayName = "Dead"),
 
 	EMS_MAX				UMETA(DisplayName = "DefaultMAX")
 };
@@ -127,4 +128,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	void Die();
 };

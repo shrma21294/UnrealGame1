@@ -320,7 +320,13 @@ void AMain::IncrementCoins(int32 Amount)
 
 void AMain::Die()
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && CombatMontage) 
+	{
+		AnimInstance->Montage_Play(CombatMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(FName("Dealth"));
 
+	}
 }
 
 void AMain::SetMovementStatus(EMovementStatus Status)

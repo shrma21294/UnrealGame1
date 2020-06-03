@@ -14,6 +14,7 @@
 #include "Sound/SoundCue.h"
 #include "Animation/AnimInstance.h"
 #include "TimerManager.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -293,6 +294,38 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 float AttackTime = FMath::FRandRange(AttackMinTime, AttackMaxTime);
 		 GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
 	 }
+ }
+
+ float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+ {
+	 if (Health - DamageAmount <= 0.f)
+	 {
+		 Health -= DamageAmount;
+		 Die();
+	 }
+	 else
+	 {
+		 Health -= DamageAmount;
+	 }
+
+	 return DamageAmount;
+ }
+
+ void AEnemy::Die()
+ {
+	 UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	 if (AnimInstance)
+	 {
+		 AnimInstance->Montage_Play(CombatMontage, 1.35f);
+		 AnimInstance->Montage_JumpToSection(FName("Death"), CombatMontage);
+	 }
+
+	 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
+
+	 CombatCollisionEnemy->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	 AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	 CombatSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	 GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
  }
 
 
