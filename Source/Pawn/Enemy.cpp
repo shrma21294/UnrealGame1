@@ -45,6 +45,10 @@ AEnemy::AEnemy()
 	AttackMinTime = 0.5f;
 
 	AttackMaxTime = 3.5f;
+
+	EnemyMovementStatus = EEnemyMovementStatus::EMS_Idle;
+
+	DeathDelay = 3.0f;
 }
 
 // Called when the game starts or when spawned
@@ -90,7 +94,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
  void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
  {
-	 if (OtherActor)
+	 if (OtherActor && Alive())
 	 {
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
@@ -120,7 +124,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
  void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
  {
-	 if (OtherActor)
+	 if (OtherActor && Alive())
 	 {
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 {
@@ -266,21 +270,24 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
  //play swing sound when enemey claw is swinged
  void AEnemy::Attack()
  {
-	 if (AIController)
+	 if (Alive())
 	 {
-		 AIController->StopMovement();
-		 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
-	 }
-
-	 if (!bAttacking)
-	 {
-		 //play attacking animatioon
-		 bAttacking = true;
-		 UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		 if (AnimInstance)
+		 if (AIController)
 		 {
-			 AnimInstance->Montage_Play(CombatMontage, 1.35f);
-			 AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage); 
+			 AIController->StopMovement();
+			 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+		 }
+
+		 if (!bAttacking)
+		 {
+			 //play attacking animatioon
+			 bAttacking = true;
+			 UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			 if (AnimInstance)
+			 {
+				 AnimInstance->Montage_Play(CombatMontage, 1.35f);
+				 AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage);
+			 }
 		 }
 	 }
  }
@@ -328,4 +335,21 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	 GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
  }
 
+ void AEnemy::DeathEnd()
+ {
+	 GetMesh()->bPauseAnims = true;
+	 GetMesh()->bNoSkeletonUpdate = true;
 
+	 //after timer is up - it will destroy the actor - here the enemy
+	 GetWorldTimerManager().SetTimer(DeathTimer, this, &AEnemy::Disappear, DeathDelay);
+ }
+
+ bool AEnemy::Alive()
+ {
+	 return GetEnemyMovementStatus() != EEnemyMovementStatus::EMS_Dead;
+ }
+
+ void AEnemy::Disappear()
+ {
+	 Destroy();
+ }
