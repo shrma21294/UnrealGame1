@@ -13,6 +13,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Sound/SoundCue.h"
 #include "Animation/AnimInstance.h"
+#include "TimerManager.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -149,6 +150,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 				 MoveToTarget(Main);
 				 CombatTarget = nullptr;
 			 }
+			 //when player moves away from the enemy - reset the timer
+			 GetWorldTimerManager().ClearTimer(AttackTimer);
 		 }
 	 }
  }
@@ -278,7 +281,9 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	 bAttacking = false;
 	 if (bOverlappingCombatSphere)
 	 {
-		 Attack();
+		 //setting a timer to wait between attacks by the enemy
+		 float AttackTime = FMath::FRandRange(AttackMinTime, AttackMaxTime);
+		 GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
 	 }
  }
 
