@@ -427,3 +427,9 @@ void AMain::SetInterpToEnemy(bool Interp)
 	bInterpToEnemy = Interp;
 }
 
+float AMain::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
+{
+	DecrementHealth(DamageAmount);
+
+	return DamageAmount;
+}

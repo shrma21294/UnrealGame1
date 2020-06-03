@@ -143,7 +143,10 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
-			 Main->SetCombatTarget(nullptr);
+			 if (Main-> CombatTarget == this)
+			 {
+				 Main->SetCombatTarget(nullptr);
+			 }
 			 bOverlappingCombatSphere = false;
 			 if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
 			 {
@@ -227,6 +230,11 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			 if (Main->HitSound)
 			 {
 				 UGameplayStatics::PlaySound2D(this, Main->HitSound);
+			 }
+			 if (DamageTypeClass)
+			 {
+				 //ApplyDamage ends up in the damaged actor which is Main here having his TakeDamage function called
+				 UGameplayStatics::ApplyDamage(Main, Damage, AIController, this, DamageTypeClass);
 			 }
 		 }
 	 }
