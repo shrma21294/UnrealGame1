@@ -39,6 +39,10 @@ AEnemy::AEnemy()
 	Health = 75.f;
 	MaxHealth = 100.f;
 	Damage = 10.f;
+
+	AttackMinTime = 0.5f;
+
+	AttackMaxTime = 3.5f;
 }
 
 // Called when the game starts or when spawned
