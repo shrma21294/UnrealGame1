@@ -113,6 +113,10 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
+			 if (Main->CombatTarget == this)
+			 {
+				 Main->SetCombatTarget(nullptr);
+			 }
 			 Main->SetHasCombatTarget(false);
 			 //hiding enemy healthbar here
 			 if (Main->MainPlayerController)
@@ -163,10 +167,6 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
-			 if (Main-> CombatTarget == this)
-			 {
-				 Main->SetCombatTarget(nullptr);
-			 }
 			 bOverlappingCombatSphere = false;
 			 if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
 			 {
