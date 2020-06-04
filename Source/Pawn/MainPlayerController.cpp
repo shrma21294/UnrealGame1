@@ -37,6 +37,7 @@ void AMainPlayerController::DisplayEnemyHealthBar()
 {
 	if (EnemyHealthBar)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Health bar verified and displaying"));
 		bEnemyHealthBarVisible = true;
 
 		EnemyHealthBar->SetVisibility(ESlateVisibility::Visible);
@@ -64,10 +65,10 @@ void AMainPlayerController::Tick(float DeltaTime)
 	if (EnemyHealthBar)
 	{
 		FVector2D PositionInViewport;
-
 		ProjectWorldLocationToScreen(EnemyLocation, PositionInViewport);
+		PositionInViewport.Y -= 85.f;
 
-		FVector2D SizeInViewport(200.f, 25.f); //using constructor
+		FVector2D SizeInViewport = FVector2D(300.f, 25.f); //using constructor
 
 		//set the size and the location of the healthbar above the enemy
 		EnemyHealthBar->SetPositionInViewport(PositionInViewport);

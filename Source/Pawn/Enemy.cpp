@@ -113,6 +113,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
+			 Main->SetHasCombatTarget(false);
 			 //hiding enemy healthbar here
 			 if (Main->MainPlayerController)
 			 {
@@ -141,6 +142,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 				 //displaying the health bar of enemy here
 				 if (Main->MainPlayerController) 
 				 {
+					 //UE_LOG(LogTemp, Warning, TEXT("Inside combat sphere overlap begin"));
 					 Main->MainPlayerController->DisplayEnemyHealthBar();
 				 }
 
@@ -163,7 +165,6 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 {
 			 if (Main-> CombatTarget == this)
 			 {
-				 Main->SetHasCombatTarget(false);
 				 Main->SetCombatTarget(nullptr);
 			 }
 			 bOverlappingCombatSphere = false;
