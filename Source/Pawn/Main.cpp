@@ -81,6 +81,10 @@ AMain::AMain()
 	bInterpToEnemy = false;
 
 	bHasCombatTarget = false;
+
+	bMovingForward = false;
+
+	bMovingRight = false;
 }
 
 // Called when the game starts or when spawned
@@ -115,7 +119,14 @@ void AMain::Tick(float DeltaTime)
 			{
 				Stamina -= DeltaStamina;
 			}
-			SetMovementStatus(EMovementStatus::EMS_Sprinting);
+			if (bMovingForward || bMovingRight)
+			{
+				SetMovementStatus(EMovementStatus::EMS_Sprinting);
+			}
+			else
+			{
+				SetMovementStatus(EMovementStatus::EMS_Normal);
+			}
 		}
 		else //shift key is up
 		{
@@ -145,7 +156,14 @@ void AMain::Tick(float DeltaTime)
 			else
 			{
 				Stamina -= DeltaStamina;
-				SetMovementStatus(EMovementStatus::EMS_Sprinting);
+				if (bMovingForward || bMovingRight)
+				{
+					SetMovementStatus(EMovementStatus::EMS_Sprinting);
+				}
+				else
+				{
+					SetMovementStatus(EMovementStatus::EMS_Normal);
+				}
 			}
 		}
 		else //shift key up
@@ -255,6 +273,7 @@ void AMain::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AMain::MoveForward(float Value)
 {
+	bMovingForward = false;
 	if ((Controller != nullptr) && (Value != 0.f) && (!bAttacking) && (MovementStatus != EMovementStatus::EMS_Dead))
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -263,11 +282,14 @@ void AMain::MoveForward(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 		AddMovementInput(Direction, Value);
+
+		bMovingForward = true;
 	}
 }
 
 void AMain::MoveRight(float Value)
 {
+	bMovingRight = false;
 	if ((Controller != nullptr) && (Value != 0.f) && (!bAttacking) && (MovementStatus != EMovementStatus::EMS_Dead))
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -276,6 +298,9 @@ void AMain::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 		AddMovementInput(Direction, Value);
+
+		//we don't want the player to move when no button is pressed.
+		bMovingRight = true;
 	}
 }
 
