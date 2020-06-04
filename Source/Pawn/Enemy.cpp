@@ -50,6 +50,8 @@ AEnemy::AEnemy()
 	EnemyMovementStatus = EEnemyMovementStatus::EMS_Idle;
 
 	DeathDelay = 3.0f;
+
+	bHasValidTarget = false;
 }
 
 // Called when the game starts or when spawned
@@ -113,6 +115,8 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
+			 //stop attacking when nHasValid Target is false
+			 bHasValidTarget = false;
 			 if (Main->CombatTarget == this)
 			 {
 				 Main->SetCombatTarget(nullptr);
@@ -141,6 +145,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 {
 			 if (Main)
 			 {
+				 bHasValidTarget = true;
 				 Main->SetCombatTarget(this);
 				 Main->SetHasCombatTarget(true);
 				 //displaying the health bar of enemy here
@@ -285,7 +290,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
  //play swing sound when enemey claw is swinged
  void AEnemy::Attack()
  {
-	 if (Alive())
+	 if (Alive() && bHasValidTarget)
 	 {
 		 if (AIController)
 		 {
