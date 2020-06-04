@@ -16,6 +16,7 @@
 #include "Sound/SoundCue.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Enemy.h"
+#include "MainPlayerController.h"
 
 // Sets default values
 AMain::AMain()
@@ -87,7 +88,7 @@ void AMain::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	MainPlayerController = Cast<AMainPlayerController>(GetController());
 	
 }
 
@@ -203,6 +204,16 @@ void AMain::Tick(float DeltaTime)
 		SetActorRotation(InterpRotation);
 	}
 
+	//storing the location of the enemy so that health bar can hover over it in the world
+	if (CombatTarget)
+	{
+		CombatTargetLocation = CombatTarget->GetActorLocation();
+
+		if (MainPlayerController)
+		{
+			MainPlayerController->EnemyLocation = CombatTargetLocation;
+		}
+	}
 }
 
 FRotator AMain::GetLookAtRotationYaw(FVector Target)

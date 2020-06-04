@@ -15,6 +15,7 @@
 #include "Animation/AnimInstance.h"
 #include "TimerManager.h"
 #include "Components/CapsuleComponent.h"
+#include "MainPlayerController.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -112,6 +113,11 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 AMain* Main = Cast<AMain>(OtherActor);
 		 if (Main)
 		 {
+			 //hiding enemy healthbar here
+			 if (Main->MainPlayerController)
+			 {
+				 Main->MainPlayerController->RemoveEnemyHealthBar();
+			 }
 			 SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Idle);
 			 if (AIController)
 			 {
@@ -131,6 +137,13 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			 if (Main)
 			 {
 				 Main->SetCombatTarget(this);
+				 Main->SetHasCombatTarget(true);
+				 //displaying the health bar of enemy here
+				 if (Main->MainPlayerController) 
+				 {
+					 Main->MainPlayerController->DisplayEnemyHealthBar();
+				 }
+
 				 CombatTarget = Main;
 				 bOverlappingCombatSphere = true;
 				 Attack();
@@ -150,6 +163,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		 {
 			 if (Main-> CombatTarget == this)
 			 {
+				 Main->SetHasCombatTarget(false);
 				 Main->SetCombatTarget(nullptr);
 			 }
 			 bOverlappingCombatSphere = false;
